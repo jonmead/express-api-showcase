@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+   <style>
+      #token-val {
+         width: 70%;
+         background-color: lightblue;
+         border: 1px solid blue;
+      }
+   </style>
+   <script>
+      getToken = () => {
+         fetch('http://localhost:4040/sample/login', {
+               method: "POST"
+            }).then(res => res.json())
+            .then(result =>
+               document.getElementById("token-val").innerHTML = result.token)
+      }
+      makeRequest = (withToken) => {
+         let opts = {
+            method: 'POST'
+         };
+         if (withToken) {
+            opts.headers = {
+               Authorization: 'Bearer ' + document.getElementById("token-val").innerHTML
+            }
+         }
+         fetch('http://localhost:4040/sample/jwtProtected', opts)
+            .then(response => {
+               let message;
+               if (response.status === 401) {
+                  message = "UNAUTHORIZED";
+               } else {
+                  message = response.statusText
+               }
+               document.getElementById(
+                  "api-response").innerHTML = message
+            })
+
+      }
+      makeGraphQLRequest = withToken => {
+         let opts = {
+            method: 'POST',
+            headers: {
+               'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+               query: '{ hello }'
+            })
+         };
+         if (withToken) {
+            opts.headers.Authorization = 'Bearer ' + document.getElementById("token-val").innerHTML;
+         }
+
+         fetch('http://localhost:4040/graphql', opts)
+            .then(result => {
+               if (result.status === 401) {
+                  document.getElementById(
+                     "graphql-response").innerHTML = 'UNAUTHORIZED';
+               }
+               return result.json()
+            })
+            .then(result => {
+               console.log(result);
+               document.getElementById(
+                  "graphql-response").innerHTML = JSON.stringify(result.data);
+            }).catch(e => console.log(e))
+
+      }
+      getToken();
+   </script>
+</head>
+
+<body>
+
+   <h3>Simulates a login and getting a signed jwt.</h3>
+   <textarea id="token-val">Click "Refresh Token" button to simulate a successful login.</textarea><br />
+   <button onClick="getToken()">Refresh Token</button>
+   <h3>Make a request to a jwt-protected endpoint GET #/sample/jwtProtected</h3>
+   <button onClick="makeRequest(true)">Request with token</button>
+   <button onClick="makeRequest(false)">Request without token</button>
+   <div id="api-response">Test with success or fail</div>
+
+   <h3>Make a request to a graphql endpoint</h3>
+   <button onClick="makeGraphQLRequest(true)">GraphQA with token</button>
+   <button onClick="makeGraphQLRequest(false)">GraphQL without token</button>
+   <div id="graphql-response"></div>
+</body>
+
+</html>
