@@ -18,3 +18,5 @@ yarn start
 
 ## Test out the server
 Navigate to http://localhost:4040/demo.htm and test out the setup
+* Start by creating a user (you can verify it's created by accessing the mongodb container with any mongo client)
+* Try making requests either with or without the token or not to see how routes can be protected by requiring a signed jwt token
