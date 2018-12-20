@@ -2,6 +2,18 @@
 <html>
 
 <head>
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+   <!-- Latest compiled and minified CSS -->
+   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+      crossorigin="anonymous">
+
+   <!-- Optional theme -->
+   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
+      crossorigin="anonymous">
+
+   <!-- Latest compiled and minified JavaScript -->
+   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+      crossorigin="anonymous"></script>
    <style>
       #token-val {
          width: 70%;
@@ -10,13 +22,13 @@
       }
    </style>
    <script>
-      getToken = () => {
-         fetch('http://localhost:4040/sample/login', {
-               method: "POST"
-            }).then(res => res.json())
-            .then(result =>
-               document.getElementById("token-val").innerHTML = result.token)
-      }
+      // getToken = () => {
+      //    fetch('http://localhost:4040/sample/login', {
+      //          method: "POST"
+      //       }).then(res => res.json())
+      //       .then(result =>
+      //          document.getElementById("token-val").innerHTML = result.token)
+      // }
       makeRequest = (withToken) => {
          let opts = {
             method: 'POST'
@@ -68,24 +80,42 @@
             }).catch(e => console.log(e))
 
       }
-      getToken();
+      createOrLogin = isCreate => {
+         let createLoginUrl = 'http://localhost:4040/sample/login';
+         if (isCreate) createLoginUrl = 'http://localhost:4040/sample/create'
+         fetch(createLoginUrl, {
+               method: "POST",
+               headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded'
+               },
+               body: `username=${document.getElementById("username").value}&password=${document.getElementById("password").value}`
+            })
+            .then(res => res.json())
+            .then(result =>
+               document.getElementById("token-val").innerHTML = result.token)
+
+      }
    </script>
 </head>
 
 <body>
+   <div class="container">
+      <h3>Create a new user</h3>
+      Username: <input id="username" /> Password: <input id="password" />
+      <button class="btn btn-primary" onClick="createOrLogin(true)">Create User</button>
+      <h3>Login and get a signed jwt.</h3>
+      <textarea id="token-val">Click "Refresh Token" button to login with the provided username and password.</textarea><br />
+      <button class="btn btn-primary" onClick="createOrLogin()">Refresh Token</button>
+      <h3>Make a request to a jwt-protected endpoint GET #/sample/jwtProtected</h3>
+      <button class="btn btn-primary" onClick="makeRequest(true)">Request with token</button>
+      <button class="btn btn-primary" onClick="makeRequest(false)">Request without token</button>
+      <div id="api-response">Test with success or fail</div>
 
-   <h3>Simulates a login and getting a signed jwt.</h3>
-   <textarea id="token-val">Click "Refresh Token" button to simulate a successful login.</textarea><br />
-   <button onClick="getToken()">Refresh Token</button>
-   <h3>Make a request to a jwt-protected endpoint GET #/sample/jwtProtected</h3>
-   <button onClick="makeRequest(true)">Request with token</button>
-   <button onClick="makeRequest(false)">Request without token</button>
-   <div id="api-response">Test with success or fail</div>
-
-   <h3>Make a request to a graphql endpoint</h3>
-   <button onClick="makeGraphQLRequest(true)">GraphQA with token</button>
-   <button onClick="makeGraphQLRequest(false)">GraphQL without token</button>
-   <div id="graphql-response"></div>
+      <h3>Make a request to a graphql endpoint</h3>
+      <button class="btn btn-primary" onClick="makeGraphQLRequest(true)">GraphQL with token</button>
+      <button class="btn btn-primary" onClick="makeGraphQLRequest(false)">GraphQL without token</button>
+      <div id="graphql-response"></div>
+   </div>
 </body>
 
 </html>
