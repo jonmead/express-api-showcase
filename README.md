@@ -15,3 +15,6 @@ cp .env.sample .env
 yarn
 yarn start
 ```
+
+## Test out the server
+Navigate to http://localhost:4040/demo.htm and test out the setup
