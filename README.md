@@ -2,6 +2,9 @@
 demonstration express server with express, jwt, graphql, and socket.io
 
 ## Environment setup
+* Mongodb server available (docker works great for this)
+
+```docker run --name mongo01 -p 27017:27017 -d mongo ```
 * Node enviroment with yarn and nodemon available
 ```npm install -g yarn;npm install -g nodemon```
 ```
